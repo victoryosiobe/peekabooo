@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>peekabooo – Screenshot API</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="peekabooo is a simple screenshot API. Send a URL, get back a .png. No live previews. Just clean shots."
+    />
+    <meta
+      name="keywords"
+      content="peekabooo, screenshot API, puppeteer, image capture, vercel, Victory Osiobe, GPT-4o"
+    />
+    <meta name="author" content="Victory Osiobe & GPT-4o" />
+    <meta property="og:title" content="peekabooo – Screenshot API" />
+    <meta
+      property="og:description"
+      content="Send a URL, get a screenshot. Simple as that. Built by Victory Osiobe & GPT-4o."
+    />
+    <meta property="og:image" content="./assets/images/preview.png" />
+    <meta property="og:url" content="https://peekabooo.vercel.app" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="./assets/images/apple-touch-icon.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="./assets/images/favicon-32x32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="./assets/images/favicon-16x16.png"
+    />
+    <style>
+      body {
+        margin: 0;
+        font-family: system-ui, sans-serif;
+        background: #fff;
+        color: #111;
+      }
+      header {
+        background: linear-gradient(135deg, #4a00e0, #8e2de2);
+        color: white;
+        padding: 50px 20px;
+        text-align: center;
+      }
+      header img {
+        width: 140px;
+        margin-bottom: 15px;
+      }
+      header h1 {
+        margin: 0;
+        font-size: 2.8em;
+      }
+      header p {
+        margin: 10px 0 0;
+        font-size: 1.2em;
+      }
+      main {
+        padding: 30px 20px;
+        max-width: 900px;
+        margin: auto;
+      }
+      h2 {
+        margin-top: 40px;
+      }
+      pre {
+        background: #f4f4f4;
+        padding: 15px;
+        border-radius: 6px;
+        overflow-x: auto;
+      }
+      code {
+        font-family: monospace;
+      }
+      ul {
+        padding-left: 20px;
+      }
+      footer {
+        text-align: center;
+        padding: 30px 20px;
+        color: #555;
+        font-size: 0.9em;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <img
+        src="./assets/images/hero.webp"
+        alt="Peekabooo Screenshot API Logo"
+        width="100%"
+        style="max-width: 800px; margin: auto; display: block"
+      />
+      <h1>peekabooo API</h1>
+      <p>Screenshot-as-a-Service. No frills. Just shots.</p>
+    </header>
+
+    <main>
+      <h2>📌 What is peekabooo?</h2>
+      <p>
+        <strong>peekabooo</strong> is a lightweight screenshot API. You send a
+        URL, and we respond with a crisp .png of the page. No UI wrappers, just
+        cold-blooded rendering under the hood.
+      </p>
+
+      <h2>⚙️ How to Use</h2>
+      <p>Make a GET request like this:</p>
+      <pre><code>https://peekabooo.vercel.app/screenshot?url=https://github.com/victoryosiobe/peekabooo&width=1280&height=720</code></pre>
+
+      <h3>🧾 Query Parameters:</h3>
+      <ul>
+        <li><code>url</code> – the webpage to capture (required)</li>
+        <li>
+          <code>width</code> – browser viewport width (optional, default: 1280)
+        </li>
+        <li>
+          <code>height</code> – browser viewport height (optional, default: 720)
+        </li>
+      </ul>
+
+      <h3>📥 JavaScript Example:</h3>
+      <pre><code>
+fetch("https://peekabooo.vercel.app/screenshot?url=https://github.com/victoryosiobe/peekabooo")
+  .then(res => res.blob())
+  .then(blob => {
+    const img = document.createElement("img");
+    img.src = URL.createObjectURL(blob);
+    document.body.appendChild(img);
+  });
+    </code></pre>
+
+      <h2>📦 What You Get</h2>
+      <p>
+        You get a .png image back. Save it, use it in your blog, make a gallery
+        of URL snaps — it's yours.
+      </p>
+    </main>
+
+    <footer>
+      Built from the API core to this site UI by
+      <strong>Victory Osiobe</strong> & <strong>GPT-4o</strong>. <br />
+      Just call the endpoint and <em>peekabooo</em> – you got a screenshot.
+    </footer>
+  </body>
+</html>

@@ -3,49 +3,43 @@ const chromium = require("@sparticuz/chromium");
 const puppeteer = require("puppeteer-core");
 const app = express();
 
+let browser;
+
+(async () => {
+  browser = await puppeteer.launch({
+    executablePath: await chromium.executablePath(),
+    args: chromium.args.concat([
+      "--no-sandbox",
+      "--disable-setuid-sandbox",
+      "--disable-gpu",
+      "--disable-dev-shm-usage",
+      "--single-process",
+      "--no-zygote",
+    ]),
+    headless: chromium.headless,
+  });
+})();
+
 app.get("/screenshot", async (req, res) => {
-  const { url, width, height } = req.query;
+  if (!browser) return res.status(503).send("Browser not initialized.");
 
-  // Basic URL validation helper
-  function isValidUrl(str) {
-    try {
-      new URL(str);
-      return true;
-    } catch {
-      return false;
-    }
-  }
-
-  if (!url || !isValidUrl(url)) {
-    return res.status(400).send("Invalid or missing 'url' parameter");
-  }
-
-  const viewportWidth = parseInt(width);
-  const viewportHeight = parseInt(height);
-
-  if ((width && isNaN(viewportWidth)) || (height && isNaN(viewportHeight))) {
-    return res.status(400).send("Invalid 'width' or 'height' parameter");
-  }
-
-  let browser;
+  const page = await browser.newPage();
   try {
-    browser = await puppeteer.launch({
-      executablePath: await chromium.executablePath(),
-      args: chromium.args.concat([
-        "--no-sandbox",
-        "--disable-setuid-sandbox",
-        "--disable-gpu",
-        "--disable-dev-shm-usage",
-        "--single-process",
-        "--no-zygote",
-      ]),
-      headless: chromium.headless,
-    });
+    const { url, width, height } = req.query;
+    const isValidUrl = (str) => {
+      try {
+        new URL(str);
+        return true;
+      } catch {
+        return false;
+      }
+    };
+    if (!url || !isValidUrl(url))
+      return res.status(400).send("Invalid or missing 'url'");
 
-    const page = await browser.newPage();
     await page.setViewport({
-      width: viewportWidth || 1280,
-      height: viewportHeight || 720,
+      width: parseInt(width) || 1280,
+      height: parseInt(height) || 720,
     });
 
     await page.goto(url, { waitUntil: "domcontentloaded", timeout: 8000 });
@@ -57,9 +51,9 @@ app.get("/screenshot", async (req, res) => {
     res.send(buffer);
   } catch (err) {
     console.error("Screenshot failed:", err);
-    res.status(500).send("Failed to capture screenshot", err);
+    res.status(500).send("Failed to capture screenshot");
   } finally {
-    if (browser) await browser.close();
+    await page.close();
   }
 });
 

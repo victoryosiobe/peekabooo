@@ -1,7 +1,10 @@
 const express = require("express");
 const chromium = require("@sparticuz/chromium");
 const puppeteer = require("puppeteer-core");
+const cors = require("cors");
+
 const app = express();
+app.use(cors()); // Enable CORS for all routes
 
 let browser;
 
@@ -46,7 +49,6 @@ app.get("/screenshot", async (req, res) => {
 
     const buffer = await page.screenshot({ fullPage: false });
 
-    res.set("Access-Control-Allow-Origin", "*");
     res.set("Content-Type", "image/png");
     res.send(buffer);
   } catch (err) {

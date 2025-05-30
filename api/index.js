@@ -20,6 +20,7 @@ const startServer = async () => {
       "--no-zygote",
     ]),
     headless: chromium.headless,
+    protocolTimeout: 60000, // 60 seconds, default is much lower
   });
 
   console.log("🧠 Browser launched:", await browser.version());

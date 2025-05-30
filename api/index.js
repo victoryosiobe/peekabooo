@@ -8,20 +8,23 @@ app.use(cors()); // Enable CORS for all routes
 
 let browser;
 
-browser = await puppeteer.launch({
-  executablePath: await chromium.executablePath(),
-  args: chromium.args.concat([
-    "--no-sandbox",
-    "--disable-setuid-sandbox",
-    "--disable-gpu",
-    "--disable-dev-shm-usage",
-    "--single-process",
-    "--no-zygote",
-  ]),
-  headless: chromium.headless,
-});
+(async () => {
+  browser = await puppeteer.launch({
+    executablePath: await chromium.executablePath(),
+    args: chromium.args.concat([
+      "--no-sandbox",
+      "--disable-setuid-sandbox",
+      "--disable-gpu",
+      "--disable-dev-shm-usage",
+      "--single-process",
+      "--no-zygote",
+    ]),
+    headless: chromium.headless,
+  });
+})();
 
 app.get("/screenshot", async (req, res) => {
+  console.log(browser);
   if (!browser) return res.status(503).send("Browser not initialized.");
 
   const page = await browser.newPage();

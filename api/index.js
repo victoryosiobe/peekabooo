@@ -1,5 +1,8 @@
 const express = require("express");
 const cors = require("cors");
+const app = express();
+app.use(cors());
+
 const chromium = require("@sparticuz/chromium");
 const puppeteer = require("puppeteer-extra");
 
@@ -25,12 +28,12 @@ require("puppeteer-extra-plugin-user-preferences");
 require("puppeteer-extra-plugin-user-data-dir");
 
 const StealthPlugin = require("puppeteer-extra-plugin-stealth");
-
-const app = express();
-app.use(cors());
+const pp = StealthPlugin();
+pp.enabledEvasions.delete("iframe.contentWindow");
+pp.enabledEvasions.delete("media.codecs");
+puppeteer.use(pp);
 
 let browser;
-puppeteer.use(StealthPlugin());
 
 const startServer = async () => {
   try {

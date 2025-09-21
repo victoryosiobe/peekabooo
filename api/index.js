@@ -57,6 +57,10 @@ const startServer = async () => {
       if (!browser) return res.status(503).send("Browser not initialized.");
 
       const page = await browser.newPage();
+      await page.evaluateOnNewDocument(
+        () => delete Function.prototype.toString,
+      );
+      await page.setBypassCSP(true);
       try {
         const { url, width, height } = req.query;
 

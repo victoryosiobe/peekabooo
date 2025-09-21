@@ -47,7 +47,7 @@ No wrappers. No junk. Just straight-up image.
 
 ## 🚀 Deployed on Vercel?!
 
-It's built to play nice with Vercel, using the `puppeteer-core` package, and `@sparticuz/chromium` package for chromium, as vercel doesn't come with chromium pre-installed.
+It's built to play nice with Vercel, using the `puppeteer` packages, and `@sparticuz/chromium` package for chromium, as vercel doesn't come with chromium pre-installed.
 
 ---
 

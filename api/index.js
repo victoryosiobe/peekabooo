@@ -1,12 +1,14 @@
 const express = require("express");
 const chromium = require("@sparticuz/chromium");
-const puppeteer = require("puppeteer-core");
+const puppeteer = require("puppeteer-extra");
+const StealthPlugin = require("puppeteer-extra-plugin-stealth");
 const cors = require("cors");
 
 const app = express();
 app.use(cors());
 
 let browser;
+puppeteer.use(StealthPlugin());
 
 const startServer = async () => {
   try {
@@ -50,7 +52,7 @@ const startServer = async () => {
           height: parseInt(height) || 720,
         });
 
-        await page.goto(url, { waitUntil: "domcontentloaded", timeout: 8000 });
+        await page.goto(url, { waitUntil: "networkidle2", timeout: 8000 });
 
         const buffer = await page.screenshot({ fullPage: false });
 

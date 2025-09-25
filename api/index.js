@@ -47,7 +47,7 @@ const startServer = async () => {
         "--single-process",
         "--no-zygote",
       ]),
-      headless: chromium.headless,
+      headless: false, //chromium.headless,
       protocolTimeout: 60000,
     });
 
@@ -57,10 +57,9 @@ const startServer = async () => {
       if (!browser) return res.status(503).send("Browser not initialized.");
 
       const page = await browser.newPage();
-      await page.evaluateOnNewDocument(
-        () => delete Function.prototype.toString,
+      await page.setUserAgent(
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
       );
-      await page.setBypassCSP(true);
       try {
         const { url, width, height } = req.query;
 

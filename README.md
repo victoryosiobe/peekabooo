@@ -1,4 +1,4 @@
-# 👀 peekabooo
+# peekabooo
 
 **A tiny web preview API** that lets you _screenshot any website like a ninja_.  
 Built with [Puppeteer](https://pptr.dev/), and rocking on Express.  
@@ -22,7 +22,7 @@ Hit this endpoint like:
 
 GET https://peekabooo.vercel.app/screenshot?url=https://example.com&width=1280&height=720
 
-### 🧾 Query Params
+### Query Params
 
 | Name     | Type   | Description                       |
 | -------- | ------ | --------------------------------- |

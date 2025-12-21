@@ -6,7 +6,7 @@ You send a URL, it returns a clean shot — no questions asked.
 
 ---
 
-## ⚡ What's peekabooo?
+## What's peekabooo?
 
 > _"You peek, I boo. It’s a website preview."_  
 > This is a microservice that captures full-resolution screenshots of websites.  
@@ -16,7 +16,7 @@ It’s simple, headless, and fits right in — like your best line of code on a 
 
 ---
 
-## 🎯 Usage
+## Usage
 
 Hit this endpoint like:
 
@@ -36,7 +36,7 @@ You could send requests as your website resizes so you get a perfect fit for all
 
 ---
 
-## 🖼️ Response
+## Response
 
 - Content-Type: `image/png`
 - Returns: the sweet, pixel-perfect PNG screenshot of your target site.
@@ -45,13 +45,13 @@ No wrappers. No junk. Just straight-up image.
 
 ---
 
-## 🚀 Deployed on Vercel?!
+## Deployed on Vercel?!
 
 It's built to play nice with Vercel, using the `puppeteer` packages, and `@sparticuz/chromium` package for chromium, as vercel doesn't come with chromium pre-installed.
 
 ---
 
-## 🤖 Example Fetch
+## Example Fetch
 
 ```js
 fetch(
@@ -69,13 +69,13 @@ fetch(
 
 ---
 
-🧠 Built by
+### Built by
 
 Victory Osiobe, and the GPT-4o model (It added the funky humor you seeing in this README file, lmafo).
 
 ---
 
-💡 Ideas?
+### Ideas?
 
 Use peekabooo for link previews in your blog.
 

@@ -69,13 +69,13 @@ fetch(
 
 ---
 
-### Built by
+#### Built by
 
 Victory Osiobe, and the GPT-4o model (It added the funky humor you seeing in this README file, lmafo).
 
 ---
 
-### Ideas?
+#### Ideas?
 
 Use peekabooo for link previews in your blog.
 

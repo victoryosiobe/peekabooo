@@ -30,7 +30,7 @@ GET https://peekabooo.vercel.app/screenshot?url=https://example.com&width=1280&h
 | `width`  | number | (optional) Width of the viewport  |
 | `height` | number | (optional) Height of the viewport |
 
-If `width`/`height` aren't set, defaults to `1366x768`, just like your favorite VS Code tab.
+If `width`/`height` aren't set, defaults to `1280x720`.
 
 You could send requests as your website resizes so you get a perfect fit for all screens.
 

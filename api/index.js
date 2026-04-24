@@ -5,6 +5,8 @@ app.use(cors());
 
 const chromium = require("@sparticuz/chromium");
 const puppeteer = require("puppeteer-extra");
+const useProxy = require("puppeteer-page-proxy");
+const PROXY_AUTH = process.env.PROXY_AUTH;
 
 // Add the Imports before StealthPlugin
 require("puppeteer-extra-plugin-stealth/evasions/chrome.app");
@@ -60,6 +62,7 @@ const startServer = async () => {
       await page.setUserAgent(
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
       );
+      await useProxy(page, `https://${PROXY_AUTH}@proxy.victotyosiobe.com`);
       try {
         const { url, width, height } = req.query;
 

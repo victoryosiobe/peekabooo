@@ -6,7 +6,6 @@ app.use(cors());
 
 const chromium = require("@sparticuz/chromium");
 const puppeteer = require("puppeteer-extra");
-const proxyChain = require("proxy-chain");
 const PROXY_AUTH = process.env.PROXY_AUTH;
 
 // Add the Imports before StealthPlugin
@@ -38,14 +37,28 @@ puppeteer.use(pp);
 
 let browser;
 
+const isValidUrl = (str) => {
+  try {
+    new URL(str);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
 const startServer = async () => {
   try {
-    const anonymized = await proxyChain.anonymizeProxy(
-      `https://${PROXY_AUTH}@proxy.victoryosiobe.com`,
+    // Parse proxy credentials once
+    const proxyUrl = new URL(
+      `https://${PROXY_AUTH}@proxy.victoryosiobe.com:443`,
     );
 
+    // Resolve executablePath once at startup.
+    const executablePath = await chromium.executablePath();
+
+    console.log("Launching browser...");
     browser = await puppeteer.launch({
-      executablePath: await chromium.executablePath(),
+      executablePath,
       args: chromium.args.concat([
         "--no-sandbox",
         "--disable-setuid-sandbox",
@@ -53,45 +66,44 @@ const startServer = async () => {
         "--disable-dev-shm-usage",
         "--single-process",
         "--no-zygote",
-        `--proxy-server=${anonymized}`,
+        `--proxy-server=https=${proxyUrl.hostname}:${proxyUrl.port}`,
       ]),
       headless: false, //chromium.headless,
       protocolTimeout: 60000,
     });
 
-    console.log("🧠 Browser launched:", await browser.version());
+    console.log("Browser launched:", await browser.version());
 
     app.get("/screenshot", async (req, res) => {
       if (!browser) return res.status(503).send("Browser not initialized.");
 
-      const page = await browser.newPage();
-      await page.setUserAgent(
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
-      );
+      const { url, width, height, fullPage } = req.query;
 
+      if (!url || !isValidUrl(url))
+        return res.status(400).send("Invalid or missing 'url'.");
+
+      let page;
       try {
-        const { url, width, height } = req.query;
+        page = await browser.newPage();
 
-        const isValidUrl = (str) => {
-          try {
-            new URL(str);
-            return true;
-          } catch {
-            return false;
-          }
-        };
+        // Authenticate with the proxy
+        await page.authenticate({
+          username: proxyUrl.username,
+          password: proxyUrl.password,
+        });
 
-        if (!url || !isValidUrl(url))
-          return res.status(400).send("Invalid or missing 'url'");
+        await page.setUserAgent(
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
+        );
 
         await page.setViewport({
           width: parseInt(width) || 1280,
           height: parseInt(height) || 720,
         });
 
-        await page.goto(url, { waitUntil: "networkidle2", timeout: 8000 });
+        await page.goto(url, { waitUntil: "networkidle2", timeout: 9900 });
 
-        const buffer = await page.screenshot({ fullPage: false });
+        const buffer = await page.screenshot({ fullPage: fullPage === "true" });
 
         res.set("Content-Type", "image/png");
         res.send(buffer);
@@ -99,14 +111,14 @@ const startServer = async () => {
         console.error("Screenshot failed:", err);
         res.status(500).send("Failed to capture screenshot");
       } finally {
-        await page.close();
+        if (page) await page.close();
       }
     });
 
-    app.listen(3000, () => console.log("🚀 Peekaboo running on port 3000"));
+    app.listen(3000, () => console.log("Peekabooo running on port 3000"));
   } catch (err) {
-    console.error("💥 Failed to launch browser or start server:", err);
-    process.exit(1); // Optional: exit if browser launch fails
+    console.error("Failed to launch browser or start server:", err);
+    process.exit(1); // exit if browser launch fails, standard hosts restart the app.
   }
 };
 

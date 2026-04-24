@@ -1,61 +1,54 @@
 # peekabooo
 
-**A tiny web preview API** that lets you _screenshot any website like a ninja_.  
-Built with [Puppeteer](https://pptr.dev/), and rocking on Express.  
-You send a URL, it returns a clean shot — no questions asked.
+**A tiny web preview API** that lets you screenshot any website on demand.  
+Built with [Puppeteer](https://pptr.dev/) and Express. Send a URL, get a PNG back. That's it.
 
 ---
 
 ## What's peekabooo?
 
-> _"You peek, I boo. It’s a website preview."_  
-> This is a microservice that captures full-resolution screenshots of websites.  
-> Plug it into your dashboard, builder, or just spy on your own deploys for fun.
+A lightweight microservice that captures screenshots of websites via a simple HTTP request.  
+Plug it into a dashboard, link preview system, or just use it to spy on your own deploys.
 
-It’s simple, headless, and fits right in — like your best line of code on a Sunday night.
+Headless, stealthy, and runs on Vercel without any extra setup.
 
 ---
 
 ## Usage
 
-Hit this endpoint like:
-
+```
 GET https://peekabooo.vercel.app/screenshot?url=https://example.com&width=1280&height=720
+```
 
 ### Query Params
 
-| Name     | Type   | Description                       |
-| -------- | ------ | --------------------------------- |
-| `url`    | string | The full URL you wanna screenshot |
-| `width`  | number | (optional) Width of the viewport  |
-| `height` | number | (optional) Height of the viewport |
-
-If `width`/`height` aren't set, defaults to `1280x720`.
-
-You could send requests as your website resizes so you get a perfect fit for all screens.
+| Name       | Type    | Default  | Description                                                             |
+| ---------- | ------- | -------- | ----------------------------------------------------------------------- |
+| `url`      | string  | required | The full URL to screenshot                                              |
+| `width`    | number  | `1280`   | Viewport width in pixels                                                |
+| `height`   | number  | `720`    | Viewport height in pixels                                               |
+| `fullPage` | boolean | `false`  | If `true`, captures the entire page height instead of just the viewport |
 
 ---
 
 ## Response
 
-- Content-Type: `image/png`
-- Returns: the sweet, pixel-perfect PNG screenshot of your target site.
-
-No wrappers. No junk. Just straight-up image.
+- **Content-Type:** `image/png`
+- Returns a raw PNG screenshot. No wrappers, no JSON envelope.
 
 ---
 
-## Deployed on Vercel?!
+## How it works on Vercel
 
-It's built to play nice with Vercel, using the `puppeteer` packages, and `@sparticuz/chromium` package for chromium, as vercel doesn't come with chromium pre-installed.
+Vercel doesn't ship with Chromium, so peekabooo uses `@sparticuz/chromium` to bundle a lightweight Chromium binary that runs in Vercel's serverless environment alongside `puppeteer-extra` with stealth plugins to avoid bot detection.
 
 ---
 
-## Example Fetch
+## Example
 
 ```js
 fetch(
-  "https://peekabooo.vercel.app/screenshot?url=https://github.com/victoryosiobe/peekabooo&width=1000&height=600",
+  "https://peekabooo.vercel.app/screenshot?url=https://github.com/victoryosiobe/peekabooo&width=1000&height=600&fullPage=true",
 )
   .then((res) => res.blob())
   .then((blob) => {
@@ -63,22 +56,16 @@ fetch(
     img.src = URL.createObjectURL(blob);
     document.body.appendChild(img);
   });
-
-// Boom! Screenshot shows up in the browser like magic. No iframes, no drama.
 ```
 
 ---
 
-#### Built by
+## Ideas
 
-Victory Osiobe, and the GPT-4o model (It added the funky humor you seeing in this README file, lmafo).
+- Link previews in a blog or CMS
+- Meta tag validator with visual output
+- "Just deployed" screenshots posted automatically to X
 
 ---
 
-#### Ideas?
-
-Use peekabooo for link previews in your blog.
-
-Make a meta tag validator with screenshots.
-
-Flex it on X/Twitter with "just deployed" shots.
+Built by [Victory Osiobe](https://victoryosiobe.com)

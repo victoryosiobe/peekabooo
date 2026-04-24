@@ -12,6 +12,7 @@
     "cors": "^2.8.5",
     "dotenv": "^17.4.2",
     "express": "^4.22.1",
+    "proxy-chain": "^2.7.1",
     "puppeteer-core": "^24.22.0",
     "puppeteer-extra": "^3.3.6",
     "puppeteer-extra-plugin-stealth": "^2.11.2",

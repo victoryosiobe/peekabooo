@@ -1,3 +1,4 @@
+require("dotenv").config({ quiet: true });
 const express = require("express");
 const cors = require("cors");
 const app = express();
@@ -5,7 +6,7 @@ app.use(cors());
 
 const chromium = require("@sparticuz/chromium");
 const puppeteer = require("puppeteer-extra");
-const useProxy = require("puppeteer-page-proxy");
+const proxyChain = require("proxy-chain");
 const PROXY_AUTH = process.env.PROXY_AUTH;
 
 // Add the Imports before StealthPlugin
@@ -39,6 +40,10 @@ let browser;
 
 const startServer = async () => {
   try {
+    const anonymized = await proxyChain.anonymizeProxy(
+      `https://${PROXY_AUTH}@proxy.victoryosiobe.com`,
+    );
+
     browser = await puppeteer.launch({
       executablePath: await chromium.executablePath(),
       args: chromium.args.concat([
@@ -48,6 +53,7 @@ const startServer = async () => {
         "--disable-dev-shm-usage",
         "--single-process",
         "--no-zygote",
+        `--proxy-server=${anonymized}`,
       ]),
       headless: false, //chromium.headless,
       protocolTimeout: 60000,
@@ -62,7 +68,7 @@ const startServer = async () => {
       await page.setUserAgent(
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
       );
-      await useProxy(page, `https://${PROXY_AUTH}@proxy.victotyosiobe.com`);
+
       try {
         const { url, width, height } = req.query;
 

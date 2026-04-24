@@ -10,6 +10,7 @@
   "dependencies": {
     "@sparticuz/chromium": "^133.0.0",
     "cors": "^2.8.5",
+    "dotenv": "^17.4.2",
     "express": "^4.22.1",
     "puppeteer-core": "^24.22.0",
     "puppeteer-extra": "^3.3.6",

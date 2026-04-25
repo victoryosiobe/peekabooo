@@ -50,7 +50,7 @@ const startServer = async () => {
   try {
     // Parse proxy credentials once
     const proxyUrl = new URL(
-      `https://${PROXY_AUTH}@proxy.victoryosiobe.com:443`,
+      `https://${PROXY_AUTH}@proxy.victoryosiobe.com:1080`,
     );
 
     // Resolve executablePath once at startup.
@@ -66,10 +66,11 @@ const startServer = async () => {
         "--disable-dev-shm-usage",
         "--single-process",
         "--no-zygote",
+        "--ignore-certificate-errors",
         `--proxy-server=https=${proxyUrl.hostname}:${proxyUrl.port}`,
       ]),
       headless: false, //chromium.headless,
-      protocolTimeout: 60000,
+      protocolTimeout: 3 * 60 * 1000,
     });
 
     console.log("Browser launched:", await browser.version());
@@ -101,7 +102,10 @@ const startServer = async () => {
           height: parseInt(height) || 720,
         });
 
-        await page.goto(url, { waitUntil: "networkidle2", timeout: 9900 });
+        await page.goto(url, {
+          waitUntil: "networkidle2",
+          timeout: 3 * 60 * 1000,
+        });
 
         const buffer = await page.screenshot({ fullPage: fullPage === "true" });
 

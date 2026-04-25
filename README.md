@@ -68,4 +68,4 @@ fetch(
 
 ---
 
-Built by [Victory Osiobe](https://victoryosiobe.com)
+Built by [Victory Osiobe](https://github.com/victoryosiobe)

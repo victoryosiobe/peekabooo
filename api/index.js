@@ -1,8 +1,10 @@
 require("dotenv").config({ quiet: true });
 const express = require("express");
+const path = require("path");
 const cors = require("cors");
 const app = express();
 app.use(cors());
+app.use(express.static(path.join(__dirname, "..", "public"))); // Static file serving// Web Off Redirect Middleware
 
 const chromium = require("@sparticuz/chromium");
 const puppeteer = require("puppeteer-extra");

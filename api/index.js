@@ -103,7 +103,7 @@ const startServer = async () => {
         await page.setViewport({
           width: parseInt(width) || 1280,
           height: parseInt(height) || 720,
-          deviceScaleFactor: 2, // 2x or 3x increases pixel density like brrr.
+          deviceScaleFactor: 3, // 2x or 3x increases pixel density like brrr.
         });
 
         await page.goto(url, {

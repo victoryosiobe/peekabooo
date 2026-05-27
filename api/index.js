@@ -95,9 +95,9 @@ const startServer = async () => {
           password: proxyUrl.password,
         });
 
-        const latestUA =
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36";
-        await page.setUserAgent(latestUA);
+        // const latestUA =
+        //   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36";
+        // await page.setUserAgent(latestUA);
 
         await page.setViewport({
           width: parseInt(width) || 1280,

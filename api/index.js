@@ -1,40 +1,34 @@
-require("dotenv").config({ quiet: true });
-const express = require("express");
-const path = require("path");
-const cors = require("cors");
+import dotenv from "dotenv";
+import express from "express";
+import path, { dirname } from "path";
+import { fileURLToPath } from "url";
+import cors from "cors";
+import chromium from "@sparticuz/chromium";
+import puppeteer from "puppeteer-extra";
+import StealthPlugin from "puppeteer-extra-plugin-stealth";
+import "puppeteer-extra-plugin-user-preferences";
+import "puppeteer-extra-plugin-user-data-dir";
+
+import { isNotAllowedUrl } from "../scripts/utils.js";
+
+dotenv.config({ quiet: true });
+
+// Reconstruct __dirname for ES Modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 const app = express();
 app.use(cors());
-app.use(express.static(path.join(__dirname, "..", "public"))); // Static file serving// Web Off Redirect Middleware
+app.use(express.static(path.join(__dirname, "..", "public")));
 
-const { isNotAllowedUrl } = require("../scripts/utils.js")
-
-const chromium = require("@sparticuz/chromium");
-const puppeteer = require("puppeteer-extra");
 const PROXY_AUTH = process.env.PROXY_AUTH;
-if (PROXY_AUTH === "") console.warn("WARNING: No proxy auth set, ensure variable is set in your environment. Script will run but fail function.")
+if (PROXY_AUTH === "") {
+  console.warn(
+    "WARNING: No proxy auth set, ensure variable is set in your environment. Script will run but fail function."
+  );
+}
 
-// Add the Imports before StealthPlugin
-require("puppeteer-extra-plugin-stealth/evasions/chrome.app");
-require("puppeteer-extra-plugin-stealth/evasions/chrome.csi");
-require("puppeteer-extra-plugin-stealth/evasions/chrome.loadTimes");
-require("puppeteer-extra-plugin-stealth/evasions/chrome.runtime");
-require("puppeteer-extra-plugin-stealth/evasions/defaultArgs");
-require("puppeteer-extra-plugin-stealth/evasions/iframe.contentWindow");
-require("puppeteer-extra-plugin-stealth/evasions/media.codecs");
-require("puppeteer-extra-plugin-stealth/evasions/navigator.hardwareConcurrency");
-require("puppeteer-extra-plugin-stealth/evasions/navigator.languages");
-require("puppeteer-extra-plugin-stealth/evasions/navigator.permissions");
-require("puppeteer-extra-plugin-stealth/evasions/navigator.plugins");
-require("puppeteer-extra-plugin-stealth/evasions/navigator.vendor");
-require("puppeteer-extra-plugin-stealth/evasions/navigator.webdriver");
-require("puppeteer-extra-plugin-stealth/evasions/sourceurl");
-require("puppeteer-extra-plugin-stealth/evasions/user-agent-override");
-require("puppeteer-extra-plugin-stealth/evasions/webgl.vendor");
-require("puppeteer-extra-plugin-stealth/evasions/window.outerdimensions");
-require("puppeteer-extra-plugin-user-preferences");
-require("puppeteer-extra-plugin-user-data-dir");
-
-const StealthPlugin = require("puppeteer-extra-plugin-stealth");
+// Stealth setup
 const pp = StealthPlugin();
 pp.enabledEvasions.delete("iframe.contentWindow");
 pp.enabledEvasions.delete("media.codecs");
@@ -55,10 +49,10 @@ const startServer = async () => {
   try {
     // Parse proxy credentials once
     const proxyUrl = new URL(
-      `https://${PROXY_AUTH}@proxy.victoryosiobe.com:1080`,
+      `https://${PROXY_AUTH}@proxy.victoryosiobe.com:1080`
     );
 
-    // Resolve executablePath once at startup.
+    // Resolve executablePath once at startup
     const executablePath = await chromium.executablePath();
 
     console.log("Launching browser...");
@@ -74,7 +68,7 @@ const startServer = async () => {
         "--ignore-certificate-errors",
         `--proxy-server=https=${proxyUrl.hostname}:${proxyUrl.port}`,
       ]),
-      headless: false, //chromium.headless,
+      headless: false, // chromium.headless,
       protocolTimeout: 3 * 60 * 1000,
     });
 
@@ -101,11 +95,6 @@ const startServer = async () => {
           password: proxyUrl.password,
         });
 
-        //puppeteer-extra-plugin-stealth and other plugins handles everything. Turns out, overriding useragent leaves you at a disadvantage.
-        // const latestUA =
-        //   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36";
-        // await page.setUserAgent(latestUA);
-
         await page.setViewport({
           width: parseInt(width) || 1280,
           height: parseInt(height) || 720,
@@ -131,7 +120,7 @@ const startServer = async () => {
     app.listen(3000, () => console.log("Peekabooo running on port 3000"));
   } catch (err) {
     console.error("Failed to launch browser or start server:", err);
-    process.exit(1); // exit if browser launch fails, standard hosts restart the app.
+    process.exit(1);
   }
 };
 

@@ -1,9 +1,9 @@
-function isNotAllowedUrl(url) {
-  const urlO = new URL(url);
-  //the url passed is raw text, we transformed to URL() object. it will not be invalid because external function will quit on invalid url before this fn is executed.
-  const forbiddenSchemes = ["file:", "data:", "javascript:"];
-  // .some() returns true if at least one scheme matches the protocol
-  return forbiddenSchemes.some(s => url.protocol === s);
-}
+// scripts/utils.js
 
-module.exports = { isNotAllowedUrl };
+export function isNotAllowedUrl(url) {
+  const urlO = new URL(url);
+  const forbiddenSchemes = ["file:", "data:", "javascript:"];
+
+  // Use urlO.protocol (the URL object), not url.protocol (the raw string)
+  return forbiddenSchemes.some((s) => urlO.protocol === s);
+}

@@ -4,7 +4,8 @@ import path, { dirname } from "path";
 import { fileURLToPath } from "url";
 import cors from "cors";
 import chromium from "@sparticuz/chromium";
-import puppeteer from "puppeteer-extra";
+import puppeteerCore from "puppeteer-core";
+import { addExtra } from "puppeteer-extra";
 import StealthPlugin from "puppeteer-extra-plugin-stealth";
 import "puppeteer-extra-plugin-user-preferences";
 import "puppeteer-extra-plugin-user-data-dir";
@@ -12,6 +13,9 @@ import "puppeteer-extra-plugin-user-data-dir";
 import { isNotAllowedUrl } from "../scripts/utils.js";
 
 dotenv.config({ quiet: true });
+
+// Bind puppeteer-core to puppeteer-extra explicitly to prevent internal require() calls
+const puppeteer = addExtra(puppeteerCore);
 
 // Reconstruct __dirname for ES Modules
 const __filename = fileURLToPath(import.meta.url);
@@ -22,7 +26,7 @@ app.use(cors());
 app.use(express.static(path.join(__dirname, "..", "public")));
 
 const PROXY_AUTH = process.env.PROXY_AUTH;
-if (PROXY_AUTH === "") {
+if (!PROXY_AUTH) {
   console.warn(
     "WARNING: No proxy auth set, ensure variable is set in your environment. Script will run but fail function."
   );
@@ -68,7 +72,7 @@ const startServer = async () => {
         "--ignore-certificate-errors",
         `--proxy-server=https=${proxyUrl.hostname}:${proxyUrl.port}`,
       ]),
-      headless: false, // chromium.headless,
+      headless: chromium.headless,
       protocolTimeout: 3 * 60 * 1000,
     });
 

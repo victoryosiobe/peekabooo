@@ -42,18 +42,19 @@
       body {
         margin: 0;
         font-family: system-ui, sans-serif;
-        background: #fff;
-        color: #111;
+        background: #030a21;
+        color: lightgrey;
       }
       header {
-        background: linear-gradient(135deg, #4a00e0, #8e2de2);
-        color: white;
+        background: linear-gradient(135deg, #220557, #020066);
+        color: lightgrey;
         padding: 50px 20px;
         text-align: center;
       }
       header img {
         width: 140px;
         margin-bottom: 15px;
+        opacity: 0.78;
       }
       header h1 {
         margin: 0;
@@ -72,7 +73,7 @@
         margin-top: 40px;
       }
       pre {
-        background: #f4f4f4;
+        background: black;
         padding: 15px;
         border-radius: 6px;
         overflow-x: auto;
@@ -84,17 +85,22 @@
         width: 100%;
         border-collapse: collapse;
         margin-top: 10px;
+        background: black;
       }
       th,
       td {
         text-align: left;
         padding: 10px 14px;
-        border: 1px solid #e0e0e0;
+        border: 1px solid grey;
         font-size: 0.95em;
       }
       th {
-        background: #f4f4f4;
+        background: black;
         font-weight: 600;
+      }
+      th:hover {
+        background: darkgrey;
+        color: black;
       }
       footer {
         text-align: center;
@@ -112,23 +118,22 @@
         width="100%"
         style="max-width: 800px; margin: auto; display: block"
       />
-      <h1>peekabooo API</h1>
-      <p>Screenshot-as-a-Service. No frills. Just shots.</p>
+      <h1>The Peekabooo API</h1>
+      <p>Screenshot-as-a-Service. Just shots.</p>
     </header>
 
     <main>
-      <h2>📌 What is peekabooo?</h2>
+      <h2>What Is Peekabooo?</h2>
       <p>
-        <strong>peekabooo</strong> is a lightweight screenshot API. You send a
-        URL, and we respond with a crisp .png of the page. No UI wrappers, just
-        cold-blooded rendering under the hood.
+        <strong>peekabooo</strong> is a lightweight screenshot API. Send a
+        URL, and get a crisp .png of the page. Nothing less.
       </p>
 
-      <h2>⚙️ How to Use</h2>
+      <h2>How to Use</h2>
       <p>Make a GET request like this:</p>
       <pre><code>https://peekabooo.vercel.app/screenshot?url=https://github.com/victoryosiobe/peekabooo&width=1280&height=720</code></pre>
 
-      <h3>🧾 Query Parameters</h3>
+      <h3>Query Parameters</h3>
       <table>
         <thead>
           <tr>
@@ -169,7 +174,7 @@
         </tbody>
       </table>
 
-      <h3>📥 JavaScript Example</h3>
+      <h3>JavaScript Example</h3>
       <pre><code>fetch("https://peekabooo.vercel.app/screenshot?url=https://github.com/victoryosiobe/peekabooo&fullPage=true")
   .then(res => res.blob())
   .then(blob => {
@@ -178,7 +183,7 @@
     document.body.appendChild(img);
   });</code></pre>
 
-      <h2>📦 What You Get</h2>
+      <h2>What You Get</h2>
       <p>
         A raw <code>.png</code> image. Save it, embed it, build link previews
         with it; whatever you need.

@@ -6,6 +6,26 @@ import cors from "cors";
 import chromium from "@sparticuz/chromium";
 import puppeteerCore from "puppeteer-core";
 import { addExtra } from "puppeteer-extra";
+
+// These MUST be imported BEFORE StealthPlugin.
+import "puppeteer-extra-plugin-stealth/evasions/chrome.app/index.js";
+import "puppeteer-extra-plugin-stealth/evasions/chrome.csi/index.js";
+import "puppeteer-extra-plugin-stealth/evasions/chrome.loadTimes/index.js";
+import "puppeteer-extra-plugin-stealth/evasions/chrome.runtime/index.js";
+import "puppeteer-extra-plugin-stealth/evasions/defaultArgs/index.js";
+import "puppeteer-extra-plugin-stealth/evasions/iframe.contentWindow/index.js";
+import "puppeteer-extra-plugin-stealth/evasions/media.codecs/index.js";
+import "puppeteer-extra-plugin-stealth/evasions/navigator.hardwareConcurrency/index.js";
+import "puppeteer-extra-plugin-stealth/evasions/navigator.languages/index.js";
+import "puppeteer-extra-plugin-stealth/evasions/navigator.permissions/index.js";
+import "puppeteer-extra-plugin-stealth/evasions/navigator.plugins/index.js";
+import "puppeteer-extra-plugin-stealth/evasions/navigator.vendor/index.js";
+import "puppeteer-extra-plugin-stealth/evasions/navigator.webdriver/index.js";
+import "puppeteer-extra-plugin-stealth/evasions/sourceurl/index.js";
+import "puppeteer-extra-plugin-stealth/evasions/user-agent-override/index.js";
+import "puppeteer-extra-plugin-stealth/evasions/webgl.vendor/index.js";
+import "puppeteer-extra-plugin-stealth/evasions/window.outerdimensions/index.js";
+
 import StealthPlugin from "puppeteer-extra-plugin-stealth";
 import "puppeteer-extra-plugin-user-preferences";
 import "puppeteer-extra-plugin-user-data-dir";
@@ -14,7 +34,7 @@ import { isNotAllowedUrl } from "../scripts/utils.js";
 
 dotenv.config({ quiet: true });
 
-// Bind puppeteer-core to puppeteer-extra explicitly to prevent internal require() calls
+// 2. Bind ESM puppeteer-core to puppeteer-extra
 const puppeteer = addExtra(puppeteerCore);
 
 // Reconstruct __dirname for ES Modules
@@ -51,12 +71,10 @@ const isValidUrl = (str) => {
 
 const startServer = async () => {
   try {
-    // Parse proxy credentials once
     const proxyUrl = new URL(
       `https://${PROXY_AUTH}@proxy.victoryosiobe.com:1080`
     );
 
-    // Resolve executablePath once at startup
     const executablePath = await chromium.executablePath();
 
     console.log("Launching browser...");
@@ -93,7 +111,6 @@ const startServer = async () => {
       try {
         page = await browser.newPage();
 
-        // Authenticate with the proxy
         await page.authenticate({
           username: proxyUrl.username,
           password: proxyUrl.password,

@@ -6,9 +6,12 @@ const app = express();
 app.use(cors());
 app.use(express.static(path.join(__dirname, "..", "public"))); // Static file serving// Web Off Redirect Middleware
 
+const { isNotAllowedUrl } = require("../scripts/utils.js")
+
 const chromium = require("@sparticuz/chromium");
 const puppeteer = require("puppeteer-extra");
 const PROXY_AUTH = process.env.PROXY_AUTH;
+if (PROXY_AUTH === "") console.warn("WARNING: No proxy auth set, ensure variable is set in your environment. Script will run but fail function.")
 
 // Add the Imports before StealthPlugin
 require("puppeteer-extra-plugin-stealth/evasions/chrome.app");
@@ -83,7 +86,10 @@ const startServer = async () => {
       const { url, width, height, fullPage } = req.query;
 
       if (!url || !isValidUrl(url))
-        return res.status(400).send("Invalid or missing 'url'.");
+        return res.status(400).send("Bad Request: Invalid or missing 'url'.");
+
+      if (isNotAllowedUrl(url))
+        return res.status(403).send("Blocked Access: Forbidden resource.");
 
       let page;
       try {
@@ -113,7 +119,7 @@ const startServer = async () => {
         const buffer = await page.screenshot({ fullPage: fullPage === "true" });
 
         res.set("Content-Type", "image/png");
-        res.send(buffer);
+        res.end(buffer);
       } catch (err) {
         console.error("Screenshot failed:", err);
         res.status(500).send("Failed to capture screenshot");

@@ -45,12 +45,20 @@ const app = express();
 app.use(cors());
 app.use(express.static(path.join(__dirname, "..", "public")));
 
+const REQUIRED_ENV_VARS = ["PROXY_AUTH", "PROXY_URL", "PROXY_PORT"];
+
+REQUIRED_ENV_VARS.forEach((envVar) => {
+  if (!process.env[envVar]) {
+    console.warn(
+      `WARNING: No ${envVar} set. Ensure variable is set in your environment. ` +
+        `Script will run but fail to function properly.`,
+    );
+  }
+});
+
 const PROXY_AUTH = process.env.PROXY_AUTH;
-if (!PROXY_AUTH) {
-  console.warn(
-    "WARNING: No proxy auth set, ensure variable is set in your environment. Script will run but fail function."
-  );
-}
+const PROXY_URL = process.env.PROXY_URL;
+const PROXY_PORT = process.env.PROXY_PORT;
 
 // Stealth setup
 const pp = StealthPlugin();
@@ -72,7 +80,7 @@ const isValidUrl = (str) => {
 const startServer = async () => {
   try {
     const proxyUrl = new URL(
-      `https://${PROXY_AUTH}@proxy.victoryosiobe.com:1080`
+      `https://${PROXY_AUTH}@${PROXY_URL}:${PROXY_PORT}`,
     );
 
     const executablePath = await chromium.executablePath();

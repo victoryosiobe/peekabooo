@@ -66,8 +66,6 @@ pp.enabledEvasions.delete("iframe.contentWindow");
 pp.enabledEvasions.delete("media.codecs");
 puppeteer.use(pp);
 
-let browser;
-
 const isValidUrl = (str) => {
   try {
     new URL(str);
@@ -77,80 +75,95 @@ const isValidUrl = (str) => {
   }
 };
 
-const startServer = async () => {
-  try {
-    const proxyUrl = new URL(
-      `https://${PROXY_AUTH}@${PROXY_URL}:${PROXY_PORT}`,
-    );
+const proxyUrl = new URL(`https://${PROXY_AUTH}@${PROXY_URL}:${PROXY_PORT}`);
 
-    const executablePath = await chromium.executablePath();
+let browserPromise = null;
 
-    console.log("Launching browser...");
-    browser = await puppeteer.launch({
-      executablePath,
-      args: chromium.args.concat([
-        "--no-sandbox",
-        "--disable-setuid-sandbox",
-        "--disable-gpu",
-        "--disable-dev-shm-usage",
-        "--single-process",
-        "--no-zygote",
-        "--ignore-certificate-errors",
-        `--proxy-server=https=${proxyUrl.hostname}:${proxyUrl.port}`,
-      ]),
-      headless: chromium.headless,
-      protocolTimeout: 3 * 60 * 1000,
-    });
+const launchBrowser = async () => {
+  const executablePath = await chromium.executablePath();
 
-    console.log("Browser launched:", await browser.version());
+  console.log("Launching browser...");
+  const browser = await puppeteer.launch({
+    executablePath,
+    args: chromium.args.concat([
+      "--no-sandbox",
+      "--disable-setuid-sandbox",
+      "--disable-gpu",
+      "--disable-dev-shm-usage",
+      "--single-process",
+      "--no-zygote",
+      "--ignore-certificate-errors",
+      `--proxy-server=${PROXY_URL}:${PROXY_PORT}`,
+    ]),
+    headless: chromium.headless,
+    protocolTimeout: 60 * 1000,
+  });
 
-    app.get("/screenshot", async (req, res) => {
-      if (!browser) return res.status(503).send("Browser not initialized.");
+  browser.on("disconnected", () => {
+    console.error("Browser disconnected, will relaunch on next request");
+    browserPromise = null;
+  });
 
-      const { url, width, height, fullPage } = req.query;
-
-      if (!url || !isValidUrl(url))
-        return res.status(400).send("Bad Request: Invalid or missing 'url'.");
-
-      if (isNotAllowedUrl(url))
-        return res.status(403).send("Blocked Access: Forbidden resource.");
-
-      let page;
-      try {
-        page = await browser.newPage();
-
-        await page.authenticate({
-          username: proxyUrl.username,
-          password: proxyUrl.password,
-        });
-
-        await page.setViewport({
-          width: parseInt(width) || 1280,
-          height: parseInt(height) || 720,
-        });
-
-        await page.goto(url, {
-          waitUntil: "networkidle2",
-          timeout: 3 * 60 * 1000,
-        });
-
-        const buffer = await page.screenshot({ fullPage: fullPage === "true" });
-
-        res.set("Content-Type", "image/png");
-        res.end(buffer);
-      } catch (err) {
-        console.error("Screenshot failed:", err);
-        res.status(500).send("Failed to capture screenshot");
-      } finally {
-        if (page) await page.close();
-      }
-    });
-
-    app.listen(3000, () => console.log("Peekabooo running on port 3000"));
-  } catch (err) {
-    console.error("Failed to launch browser or start server:", err);
-    process.exit(1);
-  }
+  console.log("Browser launched:", await browser.version());
+  return browser;
 };
 
-startServer();
+const getBrowser = () => {
+  if (!browserPromise) {
+    browserPromise = launchBrowser().catch((err) => {
+      browserPromise = null;
+      throw err;
+    });
+  }
+  return browserPromise;
+};
+
+app.get("/screenshot", async (req, res) => {
+  const { url, width, height, fullPage } = req.query;
+
+  if (!url || !isValidUrl(url))
+    return res.status(400).send("Bad Request: Invalid or missing 'url'.");
+
+  if (isNotAllowedUrl(url))
+    return res.status(403).send("Blocked Access: Forbidden resource.");
+
+  let page;
+  try {
+    const browser = await getBrowser();
+    page = await browser.newPage();
+
+    page.on("error", (err) => console.error("Page crashed:", url, err));
+    page.on("requestfailed", (r) =>
+      console.error("Request failed:", r.url(), r.failure()?.errorText),
+    );
+
+    await page.authenticate({
+      username: proxyUrl.username,
+      password: proxyUrl.password,
+    });
+
+    await page.setViewport({
+      width: parseInt(width) || 1280,
+      height: parseInt(height) || 720,
+    });
+
+    await page.goto(url, { waitUntil: "domcontentloaded", timeout: 20 * 1000 });
+
+    // some web pages rarely go fully idle, so stop after 5s
+    await page
+      .waitForNetworkIdle({ idleTime: 1000, timeout: 5000 })
+      .catch(() => {});
+
+    const buffer = await page.screenshot({ fullPage: fullPage === "true" });
+
+    res.set("Content-Type", "image/png");
+    res.end(buffer);
+  } catch (err) {
+    console.error("Screenshot failed:", url, err);
+    if (!res.headersSent) res.status(500).send("Failed to capture screenshot");
+  } finally {
+    if (page) await page.close().catch(() => {});
+  }
+});
+
+app.listen(3000, () => console.log("Peekabooo running on port 3000"));
